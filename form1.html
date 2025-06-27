@@ -2,12 +2,12 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>form1 – تسجيل</title>
+  <title>تسجيل الصوت</title>
 </head>
 <body>
   <h2>🎤 تسجيل صوت</h2>
   <button onclick="startRecording()">🎙️ بدء التسجيل</button>
-  <button onclick="stopRecording()">⏹️ إيقاف التسجيل</button>
+  <button onclick="stopRecording()" disabled>⏹️ إيقاف التسجيل</button>
 
   <script>
     let mediaRecorder;
@@ -21,21 +21,25 @@
       mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64 = reader.result.split(',')[1];
           localStorage.setItem("audioBase64", base64);
-          window.location.href = "form2.html"; // انتقال تلقائي
+          window.location.href = "form2.html"; // الانتقال التلقائي
         };
-        reader.readAsDataURL(blob);
+        reader.readAsDataURL(audioBlob);
       };
 
       mediaRecorder.start();
+      document.querySelector('button[onclick="startRecording()"]').disabled = true;
+      document.querySelector('button[onclick="stopRecording()"]').disabled = false;
     }
 
     function stopRecording() {
       mediaRecorder.stop();
+      document.querySelector('button[onclick="startRecording()"]').disabled = false;
+      document.querySelector('button[onclick="stopRecording()"]').disabled = true;
     }
   </script>
 </body>
