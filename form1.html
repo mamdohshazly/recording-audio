@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>form1 – تسجيل</title>
+</head>
+<body>
+  <h2>🎤 تسجيل صوت</h2>
+  <button onclick="startRecording()">🎙️ بدء التسجيل</button>
+  <button onclick="stopRecording()">⏹️ إيقاف التسجيل</button>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result.split(',')[1];
+          localStorage.setItem("audioBase64", base64);
+          window.location.href = "form2.html"; // انتقال تلقائي
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      mediaRecorder.stop();
+    }
+  </script>
+</body>
+</html>
