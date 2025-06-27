@@ -2,40 +2,29 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>form1 – تسجيل</title>
+  <title>تشغيل الصوت</title>
 </head>
 <body>
-  <h2>🎤 تسجيل صوت</h2>
-  <button onclick="startRecording()">🎙️ بدء التسجيل</button>
-  <button onclick="stopRecording()">⏹️ إيقاف التسجيل</button>
+  <h2>🎧 تشغيل الملف الصوتي</h2>
+  <audio id="player" controls></audio><br><br>
+  <button id="downloadBtn">📥 تحميل الملف</button>
 
   <script>
-    let mediaRecorder;
-    let audioChunks = [];
+    const base64 = localStorage.getItem("audioBase64");
 
-    async function startRecording() {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
+    if (base64) {
+      const audio = document.getElementById("player");
+      const dataUrl = "data:audio/webm;base64," + base64;
+      audio.src = dataUrl;
 
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result.split(',')[1];
-          localStorage.setItem("audioBase64", base64);
-          window.location.href = "form2.html"; // انتقال تلقائي
-        };
-        reader.readAsDataURL(blob);
+      document.getElementById("downloadBtn").onclick = () => {
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "recorded_audio.webm";
+        link.click();
       };
-
-      mediaRecorder.start();
-    }
-
-    function stopRecording() {
-      mediaRecorder.stop();
+    } else {
+      document.body.innerHTML = "<p>❌ لا يوجد ملف صوتي. ارجع إلى صفحة التسجيل.</p>";
     }
   </script>
 </body>
